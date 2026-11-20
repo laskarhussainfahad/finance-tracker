@@ -109,3 +109,7 @@ All routes except `/api/auth/*` need an `Authorization: Bearer <token>` header.
 - [ ] Auto-categorisation from transaction notes (e.g. "Swiggy" → Food)
 - [ ] Ask questions about your spending in plain English
 - [ ] Deploy (Vercel + Render + Neon)
+
+## Author
+
+Built by [@laskarhussainfahad](https://github.com/laskarhussainfahad).
