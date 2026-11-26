@@ -16,7 +16,7 @@ export default function Layout() {
       <header className="border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
           <div className="flex items-center gap-6">
-            <span className="text-lg font-semibold text-emerald-700 dark:text-emerald-400">₹ Finance Tracker</span>
+            <span className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white">₹ Finance Tracker</span>
             <nav className="flex gap-1">
               {links.map((l) => (
                 <NavLink
@@ -24,7 +24,7 @@ export default function Layout() {
                   to={l.to}
                   end
                   className={({ isActive }) =>
-                    `rounded-lg px-3 py-1.5 text-sm ${isActive ? "bg-emerald-50 font-medium text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300" : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"}`
+                    `rounded-lg px-3 py-1.5 text-sm ${isActive ? "bg-slate-100 font-medium text-slate-900 dark:bg-slate-800 dark:text-white" : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"}`
                   }
                 >
                   {l.label}

@@ -63,7 +63,7 @@ export default function Budgets() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {budgets.map((b) => {
           const pct = Math.round((b.spent / b.monthlyLimit) * 100);
-          const tone = pct > 100 ? "bg-rose-500" : pct >= 80 ? "bg-amber-500" : "bg-emerald-500";
+          const tone = pct > 100 ? "bg-rose-500" : pct >= 80 ? "bg-amber-500" : "bg-indigo-500";
           return (
             <div key={b.id} className="card space-y-3">
               <div className="flex items-center justify-between">

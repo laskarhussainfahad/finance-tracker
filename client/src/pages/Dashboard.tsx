@@ -4,7 +4,8 @@ import { api, Budget, currentMonth, formatINR, MonthlyPoint, monthLabel, Summary
 import MonthPicker from "../components/MonthPicker";
 import { useTheme } from "../context/ThemeContext";
 
-const COLORS = ["#059669", "#0ea5e9", "#f59e0b", "#e11d48", "#8b5cf6", "#14b8a6", "#f97316", "#64748b"];
+// Category colours for the donut chart (no greens, so income green keeps its meaning).
+const COLORS = ["#4f46e5", "#0ea5e9", "#f59e0b", "#e11d48", "#8b5cf6", "#64748b", "#f97316", "#06b6d4"];
 
 function StatCard({ label, value, tone }: { label: string; value: number; tone: string }) {
   return (
@@ -88,7 +89,7 @@ export default function Dashboard() {
               <YAxis fontSize={12} tick={{ fill: axis }} stroke={grid} tickFormatter={(v) => (Number(v) >= 1000 ? `₹${Number(v) / 1000}k` : `₹${v}`)} />
               <Tooltip formatter={(v) => formatINR(Number(v))} contentStyle={tooltipStyle} cursor={{ fill: isDark ? "#1e293b" : "#f1f5f9" }} />
               <Legend />
-              <Bar dataKey="income" name="Income" fill="#059669" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="income" name="Income" fill="#6366f1" radius={[4, 4, 0, 0]} />
               <Bar dataKey="expense" name="Expense" fill="#e11d48" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>

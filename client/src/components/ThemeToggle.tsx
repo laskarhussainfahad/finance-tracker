@@ -40,7 +40,7 @@ export default function ThemeToggle() {
           onClick={() => setChoice(o.value)}
           className={`flex h-7 w-7 items-center justify-center rounded-md ${
             choice === o.value
-              ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
+              ? "bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white"
               : "text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
           }`}
         >

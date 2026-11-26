@@ -35,7 +35,7 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
       <div className="absolute right-4 top-4"><ThemeToggle /></div>
       <form onSubmit={submit} className="card w-full max-w-sm space-y-4">
         <div>
-          <h1 className="text-2xl font-semibold text-emerald-700 dark:text-emerald-400">₹ Finance Tracker</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-white">₹ Finance Tracker</h1>
           <p className="muted text-sm">{isLogin ? "Log in to your account" : "Create your account"}</p>
         </div>
         {!isLogin && (
@@ -50,7 +50,7 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
         <button className="btn w-full" disabled={busy}>{busy ? "Please wait…" : isLogin ? "Log in" : "Sign up"}</button>
         <p className="muted text-center text-sm">
           {isLogin ? "No account? " : "Already have an account? "}
-          <Link className="font-medium text-emerald-700 dark:text-emerald-400" to={isLogin ? "/register" : "/login"}>
+          <Link className="font-medium text-indigo-600 hover:underline dark:text-indigo-400" to={isLogin ? "/register" : "/login"}>
             {isLogin ? "Sign up" : "Log in"}
           </Link>
         </p>

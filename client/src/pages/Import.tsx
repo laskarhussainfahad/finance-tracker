@@ -148,7 +148,7 @@ export default function Import() {
       </div>
 
       {done !== null && (
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-300">
+        <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-4 text-sm text-indigo-900 dark:border-indigo-900 dark:bg-indigo-950/40 dark:text-indigo-200">
           Imported {done} transaction{done === 1 ? "" : "s"}.{" "}
           <Link to="/transactions" className="font-medium underline">See them in Transactions</Link> or{" "}
           <Link to="/" className="font-medium underline">view the dashboard</Link>.
@@ -160,11 +160,11 @@ export default function Import() {
         onDragLeave={() => setDragging(false)}
         onDrop={onDrop}
         className={`card flex cursor-pointer flex-col items-center gap-2 border-2 border-dashed py-10 text-center transition-colors ${
-          dragging ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30" : ""
+          dragging ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/30" : ""
         }`}
       >
         <input type="file" accept=".csv,.xlsx,.xls,.pdf,text/csv" className="hidden" onChange={onPick} />
-        <svg viewBox="0 0 24 24" className="h-8 w-8 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+        <svg viewBox="0 0 24 24" className="h-8 w-8 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
           <path d="M12 16V4M7 9l5-5 5 5M4 20h16" />
         </svg>
         <span className="font-medium">{fileName && grid ? fileName : "Drop your statement here, or click to choose"}</span>
@@ -172,7 +172,7 @@ export default function Import() {
       </label>
 
       <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
-        <button type="button" className="font-medium text-emerald-700 hover:underline dark:text-emerald-400" onClick={trySample}>
+        <button type="button" className="font-medium text-indigo-600 hover:underline dark:text-indigo-400" onClick={trySample}>
           Try it with a sample statement
         </button>
         <a className="muted hover:underline" href="./sample-statement.csv" download>Download the sample file</a>
@@ -268,7 +268,7 @@ export default function Import() {
                   {rows.map((r) => (
                     <tr key={r.key} className={`border-t border-slate-100 dark:border-slate-800 ${r.selected ? "" : "opacity-50"}`}>
                       <td className="px-4 py-2">
-                        <input type="checkbox" aria-label="Include this row" checked={r.selected} onChange={(e) => update(r.key, { selected: e.target.checked })} className="h-4 w-4 accent-emerald-600" />
+                        <input type="checkbox" aria-label="Include this row" checked={r.selected} onChange={(e) => update(r.key, { selected: e.target.checked })} className="h-4 w-4 accent-indigo-600" />
                       </td>
                       <td className="whitespace-nowrap px-2 py-2">
                         {new Date(`${r.date}T00:00:00Z`).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" })}

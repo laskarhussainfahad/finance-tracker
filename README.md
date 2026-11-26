@@ -114,6 +114,10 @@ All routes except `/api/auth/*` need an `Authorization: Bearer <token>` header.
 |---|---|
 | ![Transactions](docs/screenshots/transactions.png) | ![Budgets](docs/screenshots/budgets.png) |
 
+**Statement import**
+
+![Statement import](docs/screenshots/import.png)
+
 ## Roadmap
 
 - [ ] Recurring transactions (rent, subscriptions)
