@@ -28,7 +28,7 @@ const OPTIONS: { value: ThemeChoice; label: string; icon: ReactNode }[] = [
 export default function ThemeToggle() {
   const { choice, setChoice } = useTheme();
   return (
-    <div className="flex rounded-lg border border-slate-200 p-0.5 dark:border-slate-700" role="radiogroup" aria-label="Theme">
+    <div className="flex rounded-full border border-neutral-200 p-0.5 dark:border-neutral-800" role="radiogroup" aria-label="Theme">
       {OPTIONS.map((o) => (
         <button
           key={o.value}
@@ -38,10 +38,10 @@ export default function ThemeToggle() {
           title={o.label}
           aria-label={o.label}
           onClick={() => setChoice(o.value)}
-          className={`flex h-7 w-7 items-center justify-center rounded-md ${
+          className={`flex h-7 w-7 items-center justify-center rounded-full ${
             choice === o.value
-              ? "bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white"
-              : "text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+              ? "bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-white"
+              : "text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
           }`}
         >
           {o.icon}

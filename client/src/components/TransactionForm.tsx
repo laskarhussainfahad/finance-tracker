@@ -48,8 +48,8 @@ export default function TransactionForm({ categories, initial, onSubmit, onCance
             onClick={() => changeType(t)}
             className={`rounded-lg border px-3 py-2 text-sm font-medium ${
               type === t
-                ? t === "EXPENSE" ? "border-rose-300 bg-rose-50 text-rose-700 dark:border-rose-800 dark:bg-rose-950/50 dark:text-rose-300" : "border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300"
-                : "border-slate-200 text-slate-500 dark:border-slate-700 dark:text-slate-400"
+                ? t === "EXPENSE" ? "border-neutral-900 bg-neutral-900 text-white dark:border-white dark:bg-white dark:text-black" : "border-neutral-900 bg-neutral-900 text-white dark:border-white dark:bg-white dark:text-black"
+                : "border-neutral-200 text-neutral-500 dark:border-neutral-700 dark:text-neutral-400"
             }`}
           >
             {t === "EXPENSE" ? "Expense" : "Income"}
@@ -74,7 +74,7 @@ export default function TransactionForm({ categories, initial, onSubmit, onCance
         Note (optional)
         <input className="input mt-1" maxLength={200} value={note} onChange={(e) => setNote(e.target.value)} />
       </label>
-      {error && <p className="text-sm text-rose-600 dark:text-rose-400">{error}</p>}
+      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
       <div className="flex justify-end gap-2 pt-2">
         <button type="button" className="btn-ghost" onClick={onCancel}>Cancel</button>
         <button className="btn" disabled={saving}>{saving ? "Saving…" : initial ? "Save changes" : "Add transaction"}</button>

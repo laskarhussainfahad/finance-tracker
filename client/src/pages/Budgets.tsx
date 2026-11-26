@@ -57,31 +57,31 @@ export default function Budgets() {
           <input className="input mt-1" type="number" min="1" required value={limit} onChange={(e) => setLimit(e.target.value)} />
         </label>
         <button className="btn">Set budget</button>
-        {error && <p className="w-full text-sm text-rose-600 dark:text-rose-400">{error}</p>}
+        {error && <p className="w-full text-sm text-red-600 dark:text-red-400">{error}</p>}
       </form>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {budgets.map((b) => {
           const pct = Math.round((b.spent / b.monthlyLimit) * 100);
-          const tone = pct > 100 ? "bg-rose-500" : pct >= 80 ? "bg-amber-500" : "bg-indigo-500";
+          const tone = pct > 100 ? "bg-red-500" : pct >= 80 ? "bg-amber-500" : "bg-neutral-900 dark:bg-white";
           return (
             <div key={b.id} className="card space-y-3">
               <div className="flex items-center justify-between">
                 <h3 className="font-medium">{b.categoryName}</h3>
-                <button className="btn-ghost text-xs text-rose-600 dark:text-rose-400" onClick={() => remove(b)}>Remove</button>
+                <button className="btn-ghost text-xs hover:text-red-600 dark:hover:text-red-400" onClick={() => remove(b)}>Remove</button>
               </div>
-              <div className="h-2.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+              <div className="h-2.5 overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
                 <div className={`h-full ${tone}`} style={{ width: `${Math.min(pct, 100)}%` }} />
               </div>
-              <p className="text-sm text-slate-600 dark:text-slate-300">
+              <p className="text-sm text-neutral-600 dark:text-neutral-300">
                 {formatINR(b.spent)} of {formatINR(b.monthlyLimit)}{" "}
-                <span className={pct > 100 ? "font-medium text-rose-600 dark:text-rose-400" : "text-slate-400 dark:text-slate-500"}>({pct}%)</span>
+                <span className={pct > 100 ? "font-medium text-red-600 dark:text-red-400" : "text-neutral-400 dark:text-neutral-500"}>({pct}%)</span>
               </p>
-              {pct > 100 && <p className="text-xs text-rose-600 dark:text-rose-400">Over by {formatINR(b.spent - b.monthlyLimit)}</p>}
+              {pct > 100 && <p className="text-xs text-red-600 dark:text-red-400">Over by {formatINR(b.spent - b.monthlyLimit)}</p>}
             </div>
           );
         })}
-        {budgets.length === 0 && <p className="text-sm text-slate-400 dark:text-slate-500">No budgets set for this month yet.</p>}
+        {budgets.length === 0 && <p className="text-sm text-neutral-400 dark:text-neutral-500">No budgets set for this month yet.</p>}
       </div>
     </div>
   );

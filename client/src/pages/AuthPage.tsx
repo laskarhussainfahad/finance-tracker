@@ -35,7 +35,7 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
       <div className="absolute right-4 top-4"><ThemeToggle /></div>
       <form onSubmit={submit} className="card w-full max-w-sm space-y-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-white">₹ Finance Tracker</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-white">Finance Tracker</h1>
           <p className="muted text-sm">{isLogin ? "Log in to your account" : "Create your account"}</p>
         </div>
         {!isLogin && (
@@ -46,15 +46,15 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
           className="input" type="password" placeholder="Password" required minLength={isLogin ? 1 : 8}
           value={password} onChange={(e) => setPassword(e.target.value)}
         />
-        {error && <p className="text-sm text-rose-600 dark:text-rose-400">{error}</p>}
+        {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
         <button className="btn w-full" disabled={busy}>{busy ? "Please wait…" : isLogin ? "Log in" : "Sign up"}</button>
         <p className="muted text-center text-sm">
           {isLogin ? "No account? " : "Already have an account? "}
-          <Link className="font-medium text-indigo-600 hover:underline dark:text-indigo-400" to={isLogin ? "/register" : "/login"}>
+          <Link className="font-medium text-neutral-900 underline underline-offset-4 dark:text-white" to={isLogin ? "/register" : "/login"}>
             {isLogin ? "Sign up" : "Log in"}
           </Link>
         </p>
-        {isLogin && <p className="text-center text-xs text-slate-400 dark:text-slate-500">Demo: demo@example.com / demo12345</p>}
+        {isLogin && <p className="text-center text-xs text-neutral-400 dark:text-neutral-500">Demo: demo@example.com / demo12345</p>}
       </form>
     </div>
   );

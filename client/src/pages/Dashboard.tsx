@@ -4,14 +4,14 @@ import { api, Budget, currentMonth, formatINR, MonthlyPoint, monthLabel, Summary
 import MonthPicker from "../components/MonthPicker";
 import { useTheme } from "../context/ThemeContext";
 
-// Category colours for the donut chart (no greens, so income green keeps its meaning).
-const COLORS = ["#4f46e5", "#0ea5e9", "#f59e0b", "#e11d48", "#8b5cf6", "#64748b", "#f97316", "#06b6d4"];
+// Category colours for the donut chart, in the spirit of Vercel's palette.
+const COLORS = ["#0070f3", "#7928ca", "#eb367f", "#f5a623", "#8f8f8f", "#3291ff", "#d4d4d4", "#ff4d4d"];
 
 function StatCard({ label, value, tone }: { label: string; value: number; tone: string }) {
   return (
     <div className="card">
       <p className="muted text-sm">{label}</p>
-      <p className={`mt-1 text-2xl font-semibold ${tone}`}>{formatINR(value)}</p>
+      <p className={`amount mt-2 text-2xl font-semibold tracking-tight ${tone}`}>{formatINR(value)}</p>
     </div>
   );
 }
@@ -23,13 +23,13 @@ export default function Dashboard() {
   const [overBudget, setOverBudget] = useState<Budget[]>([]);
   const { isDark } = useTheme();
   // Chart colours that read well on both backgrounds
-  const axis = isDark ? "#94a3b8" : "#64748b";
-  const grid = isDark ? "#1e293b" : "#e2e8f0";
+  const axis = isDark ? "#a3a3a3" : "#737373";
+  const grid = isDark ? "#1f1f1f" : "#ededed";
   const tooltipStyle = {
-    backgroundColor: isDark ? "#0f172a" : "#ffffff",
-    border: `1px solid ${isDark ? "#334155" : "#e2e8f0"}`,
+    backgroundColor: isDark ? "#0a0a0a" : "#ffffff",
+    border: `1px solid ${isDark ? "#262626" : "#e5e5e5"}`,
     borderRadius: 8,
-    color: isDark ? "#f1f5f9" : "#1e293b",
+    color: isDark ? "#fafafa" : "#171717",
   };
 
   useEffect(() => {
@@ -51,15 +51,15 @@ export default function Dashboard() {
       </div>
 
       {overBudget.length > 0 && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-300">
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-300">
           Over budget this month: {overBudget.map((b) => `${b.categoryName} (${formatINR(b.spent - b.monthlyLimit)} over)`).join(", ")}
         </div>
       )}
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <StatCard label="Income" value={summary?.income ?? 0} tone="text-emerald-600 dark:text-emerald-400" />
-        <StatCard label="Expenses" value={summary?.expense ?? 0} tone="text-rose-600 dark:text-rose-400" />
-        <StatCard label="Balance" value={summary?.balance ?? 0} tone={(summary?.balance ?? 0) >= 0 ? "text-slate-800 dark:text-slate-100" : "text-rose-600 dark:text-rose-400"} />
+        <StatCard label="Income" value={summary?.income ?? 0} tone="text-neutral-900 dark:text-white" />
+        <StatCard label="Expenses" value={summary?.expense ?? 0} tone="text-neutral-900 dark:text-white" />
+        <StatCard label="Balance" value={summary?.balance ?? 0} tone={(summary?.balance ?? 0) >= 0 ? "text-neutral-800 dark:text-neutral-100" : "text-red-600 dark:text-red-400"} />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
@@ -68,7 +68,7 @@ export default function Dashboard() {
           {summary && summary.byCategory.length > 0 ? (
             <ResponsiveContainer width="100%" height={280}>
               <PieChart>
-                <Pie data={summary.byCategory} dataKey="amount" nameKey="category" innerRadius={60} outerRadius={100} paddingAngle={2} stroke={isDark ? "#0f172a" : "#ffffff"}>
+                <Pie data={summary.byCategory} dataKey="amount" nameKey="category" innerRadius={60} outerRadius={100} paddingAngle={2} stroke={isDark ? "#0a0a0a" : "#ffffff"}>
                   {summary.byCategory.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Pie>
                 <Tooltip formatter={(v) => formatINR(Number(v))} contentStyle={tooltipStyle} itemStyle={{ color: tooltipStyle.color }} />
@@ -76,7 +76,7 @@ export default function Dashboard() {
               </PieChart>
             </ResponsiveContainer>
           ) : (
-            <p className="py-16 text-center text-sm text-slate-400 dark:text-slate-500">No expenses this month yet.</p>
+            <p className="py-16 text-center text-sm text-neutral-400 dark:text-neutral-500">No expenses this month yet.</p>
           )}
         </div>
 
@@ -87,10 +87,10 @@ export default function Dashboard() {
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={grid} />
               <XAxis dataKey="month" fontSize={12} tick={{ fill: axis }} stroke={grid} />
               <YAxis fontSize={12} tick={{ fill: axis }} stroke={grid} tickFormatter={(v) => (Number(v) >= 1000 ? `₹${Number(v) / 1000}k` : `₹${v}`)} />
-              <Tooltip formatter={(v) => formatINR(Number(v))} contentStyle={tooltipStyle} cursor={{ fill: isDark ? "#1e293b" : "#f1f5f9" }} />
+              <Tooltip formatter={(v) => formatINR(Number(v))} contentStyle={tooltipStyle} cursor={{ fill: isDark ? "#171717" : "#f5f5f5" }} />
               <Legend />
-              <Bar dataKey="income" name="Income" fill="#6366f1" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="expense" name="Expense" fill="#e11d48" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="income" name="Income" fill={isDark ? "#ededed" : "#171717"} radius={[4, 4, 0, 0]} />
+              <Bar dataKey="expense" name="Expense" fill={isDark ? "#525252" : "#a3a3a3"} radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

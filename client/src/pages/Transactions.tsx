@@ -50,7 +50,7 @@ export default function Transactions() {
 
       <div className="card overflow-x-auto p-0">
         <table className="w-full text-sm">
-          <thead className="border-b border-slate-200 text-left text-slate-500 dark:border-slate-800 dark:text-slate-400">
+          <thead className="border-b border-neutral-200 text-left text-neutral-500 dark:border-neutral-800 dark:text-neutral-400">
             <tr>
               <th className="px-5 py-3 font-medium">Date</th>
               <th className="px-5 py-3 font-medium">Category</th>
@@ -61,23 +61,23 @@ export default function Transactions() {
           </thead>
           <tbody>
             {items.map((tx) => (
-              <tr key={tx.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800/50">
+              <tr key={tx.id} className="border-b border-neutral-100 last:border-0 hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800/50">
                 <td className="px-5 py-3 whitespace-nowrap">
                   {new Date(tx.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", timeZone: "UTC" })}
                 </td>
                 <td className="px-5 py-3">{tx.category.name}</td>
                 <td className="muted px-5 py-3">{tx.note}</td>
-                <td className={`px-5 py-3 text-right font-medium ${tx.type === "INCOME" ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
+                <td className={`amount px-5 py-3 text-right font-medium ${tx.type === "INCOME" ? "text-neutral-900 dark:text-white" : "text-neutral-500 dark:text-neutral-400"}`}>
                   {tx.type === "INCOME" ? "+" : "−"}{formatINR(tx.amount)}
                 </td>
                 <td className="px-5 py-3 text-right whitespace-nowrap">
                   <button className="btn-ghost" onClick={() => setEditing(tx)}>Edit</button>
-                  <button className="btn-ghost text-rose-600 dark:text-rose-400" onClick={() => remove(tx)}>Delete</button>
+                  <button className="btn-ghost hover:text-red-600 dark:hover:text-red-400" onClick={() => remove(tx)}>Delete</button>
                 </td>
               </tr>
             ))}
             {items.length === 0 && (
-              <tr><td colSpan={5} className="px-5 py-12 text-center text-slate-400 dark:text-slate-500">No transactions for this month.</td></tr>
+              <tr><td colSpan={5} className="px-5 py-12 text-center text-neutral-400 dark:text-neutral-500">No transactions for this month.</td></tr>
             )}
           </tbody>
         </table>

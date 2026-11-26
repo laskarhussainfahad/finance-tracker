@@ -148,7 +148,7 @@ export default function Import() {
       </div>
 
       {done !== null && (
-        <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-4 text-sm text-indigo-900 dark:border-indigo-900 dark:bg-indigo-950/40 dark:text-indigo-200">
+        <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4 text-sm text-neutral-900 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-100">
           Imported {done} transaction{done === 1 ? "" : "s"}.{" "}
           <Link to="/transactions" className="font-medium underline">See them in Transactions</Link> or{" "}
           <Link to="/" className="font-medium underline">view the dashboard</Link>.
@@ -160,11 +160,11 @@ export default function Import() {
         onDragLeave={() => setDragging(false)}
         onDrop={onDrop}
         className={`card flex cursor-pointer flex-col items-center gap-2 border-2 border-dashed py-10 text-center transition-colors ${
-          dragging ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/30" : ""
+          dragging ? "border-neutral-900 bg-neutral-50 dark:border-white dark:bg-neutral-900" : ""
         }`}
       >
         <input type="file" accept=".csv,.xlsx,.xls,.pdf,text/csv" className="hidden" onChange={onPick} />
-        <svg viewBox="0 0 24 24" className="h-8 w-8 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+        <svg viewBox="0 0 24 24" className="h-8 w-8 text-neutral-400 dark:text-neutral-500" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
           <path d="M12 16V4M7 9l5-5 5 5M4 20h16" />
         </svg>
         <span className="font-medium">{fileName && grid ? fileName : "Drop your statement here, or click to choose"}</span>
@@ -172,7 +172,7 @@ export default function Import() {
       </label>
 
       <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
-        <button type="button" className="font-medium text-indigo-600 hover:underline dark:text-indigo-400" onClick={trySample}>
+        <button type="button" className="font-medium text-neutral-900 underline underline-offset-4 hover:text-neutral-600 dark:text-white dark:hover:text-neutral-300" onClick={trySample}>
           Try it with a sample statement
         </button>
         <a className="muted hover:underline" href="./sample-statement.csv" download>Download the sample file</a>
@@ -188,7 +188,7 @@ export default function Import() {
         </ol>
       </details>
 
-      {error && <p className="text-sm text-rose-600 dark:text-rose-400">{error}</p>}
+      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
 
       {grid && (
         <>
@@ -228,7 +228,7 @@ export default function Import() {
               )}
             </div>
             {directionUnknown(grid, mapping) && (
-              <p className="rounded-lg bg-amber-50 p-3 text-sm text-amber-800 dark:bg-amber-950/40 dark:text-amber-300">
+              <p className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200">
                 This file doesn't say which amounts are money in, so every row is set to Expense. Switch any income rows below.
               </p>
             )}
@@ -252,9 +252,9 @@ export default function Import() {
                 </button>
               </div>
             </div>
-            <div className="max-h-[32rem] overflow-auto border-t border-slate-200 dark:border-slate-800">
+            <div className="max-h-[32rem] overflow-auto border-t border-neutral-200 dark:border-neutral-800">
               <table className="w-full text-sm">
-                <thead className="sticky top-0 bg-white text-left text-slate-500 dark:bg-slate-900 dark:text-slate-400">
+                <thead className="sticky top-0 bg-white text-left text-neutral-500 dark:bg-neutral-900 dark:text-neutral-400">
                   <tr>
                     <th className="w-10 px-4 py-2" />
                     <th className="px-2 py-2 font-medium">Date</th>
@@ -266,9 +266,9 @@ export default function Import() {
                 </thead>
                 <tbody>
                   {rows.map((r) => (
-                    <tr key={r.key} className={`border-t border-slate-100 dark:border-slate-800 ${r.selected ? "" : "opacity-50"}`}>
+                    <tr key={r.key} className={`border-t border-neutral-100 dark:border-neutral-800 ${r.selected ? "" : "opacity-50"}`}>
                       <td className="px-4 py-2">
-                        <input type="checkbox" aria-label="Include this row" checked={r.selected} onChange={(e) => update(r.key, { selected: e.target.checked })} className="h-4 w-4 accent-indigo-600" />
+                        <input type="checkbox" aria-label="Include this row" checked={r.selected} onChange={(e) => update(r.key, { selected: e.target.checked })} className="h-4 w-4 accent-black dark:accent-white" />
                       </td>
                       <td className="whitespace-nowrap px-2 py-2">
                         {new Date(`${r.date}T00:00:00Z`).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" })}
@@ -288,13 +288,13 @@ export default function Import() {
                           {categories.filter((c) => c.type === r.type).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                         </select>
                       </td>
-                      <td className={`whitespace-nowrap px-4 py-2 text-right font-medium ${r.type === "INCOME" ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
+                      <td className={`amount whitespace-nowrap px-4 py-2 text-right font-medium ${r.type === "INCOME" ? "text-neutral-900 dark:text-white" : "text-neutral-500 dark:text-neutral-400"}`}>
                         {r.type === "INCOME" ? "+" : "−"}{formatINR(r.amount)}
                       </td>
                     </tr>
                   ))}
                   {rows.length === 0 && (
-                    <tr><td colSpan={6} className="px-5 py-10 text-center text-slate-400 dark:text-slate-500">No transactions found with these columns. Try changing them above.</td></tr>
+                    <tr><td colSpan={6} className="px-5 py-10 text-center text-neutral-400 dark:text-neutral-500">No transactions found with these columns. Try changing them above.</td></tr>
                   )}
                 </tbody>
               </table>
