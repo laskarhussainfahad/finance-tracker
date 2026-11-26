@@ -12,6 +12,7 @@ It runs entirely in your browser: no server or database to set up, and your data
 
 - **Accounts**: sign up and log in with hashed passwords (bcrypt) and JWT authentication
 - **Transactions**: add, edit, delete and filter income and expenses by month and type
+- **Search by name**: type a person or merchant (e.g. "Swiggy") to see every matching transaction with total sent, total received and the net, for all time or the current month
 - **Categories**: sensible defaults (Food, Rent, Salary…) created for every new user
 - **Dashboard**: monthly income, expenses and balance, a spending-by-category donut chart, and a 6-month income-vs-expense bar chart
 - **Budgets**: set a monthly limit per category, with progress bars that turn amber at 80% and red when you go over, plus an over-budget alert on the dashboard
