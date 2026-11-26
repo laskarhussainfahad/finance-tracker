@@ -46,6 +46,11 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
           className="input" type="password" placeholder="Password" required minLength={isLogin ? 1 : 8}
           value={password} onChange={(e) => setPassword(e.target.value)}
         />
+        {isLogin && (
+          <div className="-mt-2 text-right">
+            <Link className="muted text-xs hover:text-neutral-900 hover:underline dark:hover:text-white" to="/forgot">Forgot password?</Link>
+          </div>
+        )}
         {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
         <button className="btn w-full" disabled={busy}>{busy ? "Please wait…" : isLogin ? "Log in" : "Sign up"}</button>
         <p className="muted text-center text-sm">

@@ -3,7 +3,7 @@
 // Each visitor's data stays in their own browser.
 
 type TxType = "INCOME" | "EXPENSE";
-interface UserRow { id: number; name: string; email: string; passwordHash: string }
+interface UserRow { id: number; name: string; email: string; passwordHash: string; recoveryHash?: string }
 interface CategoryRow { id: number; name: string; type: TxType; userId: number }
 interface TxRow { id: number; amount: number; type: TxType; date: string; note: string | null; categoryId: number; userId: number }
 interface BudgetRow { id: number; monthlyLimit: number; month: string; categoryId: number; userId: number }
@@ -35,6 +35,17 @@ async function hash(password: string) {
   const bytes = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`finance-tracker:${password}`));
   return [...new Uint8Array(bytes)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
+
+// Recovery keys replace "reset by email" (there is no email server): 16 random characters
+// shown once, like XXXX-XXXX-XXXX-XXXX. Only a hash is stored.
+const KEY_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no 0/O or 1/I, so it's easy to copy by hand
+function newRecoveryKey() {
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
+  const raw = [...bytes].map((b) => KEY_CHARS[b % KEY_CHARS.length]).join("");
+  return raw.match(/.{4}/g)!.join("-");
+}
+const normalizeKey = (k: unknown) => String(k ?? "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+const hashKey = (k: unknown) => hash(`recovery:${normalizeKey(k)}`);
 
 const isMonth = (m: unknown): m is string => typeof m === "string" && /^\d{4}-(0[1-9]|1[0-2])$/.test(m);
 const currentMonth = () => new Date().toISOString().slice(0, 7);
@@ -106,6 +117,15 @@ export async function localApi(method: string, path: string, body: any, token: s
 
   // ----- Auth (no token needed) -----
   if (parts[0] === "auth") {
+    // Logged in: replace the recovery key (the old one stops working).
+    if (parts[1] === "recovery-key") {
+      const user = db.users.find((u) => u.id === Number(token));
+      if (!user) throw new ApiError(401, "Please log in again");
+      const recoveryKey = newRecoveryKey();
+      user.recoveryHash = await hashKey(recoveryKey);
+      save(db);
+      return { recoveryKey };
+    }
     const email = String(body?.email ?? "").trim().toLowerCase();
     const password = String(body?.password ?? "");
     if (!/^\S+@\S+\.\S+$/.test(email)) throw new ApiError(400, "Enter a valid email");
@@ -114,11 +134,25 @@ export async function localApi(method: string, path: string, body: any, token: s
       if (!name) throw new ApiError(400, "Enter your name");
       if (password.length < 8) throw new ApiError(400, "Password must be at least 8 characters");
       if (db.users.some((u) => u.email === email)) throw new ApiError(409, "Email already registered");
-      const user: UserRow = { id: db.nextId++, name, email, passwordHash: await hash(password) };
+      const recoveryKey = newRecoveryKey();
+      const user: UserRow = { id: db.nextId++, name, email, passwordHash: await hash(password), recoveryHash: await hashKey(recoveryKey) };
       db.users.push(user);
       addCategories(db, user.id);
       save(db);
-      return { token: String(user.id), user: { id: user.id, name, email } };
+      return { token: String(user.id), user: { id: user.id, name, email }, recoveryKey };
+    }
+    // Forgot password: email + recovery key -> new password. The key is single-use: a new one is issued.
+    if (parts[1] === "reset") {
+      const user = db.users.find((u) => u.email === email);
+      if (password.length < 8) throw new ApiError(400, "Password must be at least 8 characters");
+      if (!user || !user.recoveryHash || user.recoveryHash !== (await hashKey(body?.recoveryKey))) {
+        throw new ApiError(400, "That email and recovery key don't match");
+      }
+      const recoveryKey = newRecoveryKey();
+      user.passwordHash = await hash(password);
+      user.recoveryHash = await hashKey(recoveryKey);
+      save(db);
+      return { token: String(user.id), user: { id: user.id, name: user.name, email }, recoveryKey };
     }
     if (parts[1] === "login") {
       const user = db.users.find((u) => u.email === email);

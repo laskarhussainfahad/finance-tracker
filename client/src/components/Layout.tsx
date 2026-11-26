@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import ThemeToggle from "./ThemeToggle";
+import RecoveryKeyModal from "./RecoveryKeyModal";
 
 const links = [
   { to: "/", label: "Dashboard" },
@@ -34,7 +35,7 @@ export default function Layout() {
           </div>
           <div className="flex items-center gap-3 text-sm">
             <ThemeToggle />
-            <span className="muted hidden sm:inline">Hi, {user?.name}</span>
+            <NavLink to="/account" className="muted hidden hover:text-neutral-900 sm:inline dark:hover:text-white" title="Account">Hi, {user?.name}</NavLink>
             <button className="btn-ghost" onClick={logout}>Log out</button>
           </div>
         </div>
@@ -42,6 +43,7 @@ export default function Layout() {
       <main className="mx-auto max-w-6xl px-4 py-6">
         <Outlet />
       </main>
+      <RecoveryKeyModal />
     </div>
   );
 }

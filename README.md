@@ -11,6 +11,7 @@ It runs entirely in your browser: no server or database to set up, and your data
 ## Features
 
 - **Accounts**: sign up and log in with hashed passwords (bcrypt) and JWT authentication
+- **Forgot password**: a one-time recovery key is shown at sign-up (copy or download it). Enter it with your email to set a new password; it is then replaced with a new key. Logged-in users can create a new key from the Account page. Only a hash of the key is stored
 - **Transactions**: add, edit, delete and filter income and expenses by month and type
 - **Search by name**: type a person or merchant (e.g. "Swiggy") to see every matching transaction with total sent, total received and the net, for all time or the current month
 - **Categories**: sensible defaults (Food, Rent, Salary…) created for every new user
@@ -97,6 +98,8 @@ All routes except `/api/auth/*` need an `Authorization: Bearer <token>` header.
 |---|---|---|
 | POST | `/api/auth/register` | Create an account |
 | POST | `/api/auth/login` | Log in, returns a JWT |
+| POST | `/api/auth/reset` | Reset the password with email + recovery key (issues a new key) |
+| POST | `/api/auth/recovery-key` | Replace the recovery key (logged in) |
 | GET | `/api/transactions?month=YYYY-MM&type=INCOME\|EXPENSE` | List transactions |
 | POST / PUT / DELETE | `/api/transactions[/:id]` | Create, update, delete |
 | GET / POST | `/api/categories` | List or add categories |

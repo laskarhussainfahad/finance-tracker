@@ -75,6 +75,29 @@ describe("transactions, stats and budgets", () => {
   });
 });
 
+describe("forgot password", () => {
+  it("resets the password with the recovery key, and the key only works once", async () => {
+    const mail = `reset-${email}`;
+    const reg = await request(app).post("/api/auth/register").send({ name: "R", email: mail, password: "password123" });
+    const key = reg.body.recoveryKey as string;
+    expect(key).toMatch(/^[A-Z0-9]{4}(-[A-Z0-9]{4}){3}$/);
+
+    const wrong = await request(app).post("/api/auth/reset").send({ email: mail, recoveryKey: "AAAA-AAAA-AAAA-AAAA", password: "newpass123" });
+    expect(wrong.status).toBe(400);
+
+    const ok = await request(app).post("/api/auth/reset").send({ email: mail, recoveryKey: key.toLowerCase(), password: "newpass123" });
+    expect(ok.status).toBe(200);
+    expect(ok.body.recoveryKey).not.toBe(key);
+
+    const login = await request(app).post("/api/auth/login").send({ email: mail, password: "newpass123" });
+    expect(login.status).toBe(200);
+    const reuse = await request(app).post("/api/auth/reset").send({ email: mail, recoveryKey: key, password: "another123" });
+    expect(reuse.status).toBe(400);
+
+    await db.delete(users).where(eq(users.email, mail));
+  });
+});
+
 describe("statement import", () => {
   it("imports many transactions at once and rejects another user's category", async () => {
     const auth = { Authorization: `Bearer ${token}` };
