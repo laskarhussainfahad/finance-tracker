@@ -48,7 +48,7 @@ export default function TransactionForm({ categories, initial, onSubmit, onCance
             onClick={() => changeType(t)}
             className={`rounded-lg border px-3 py-2 text-sm font-medium ${
               type === t
-                ? t === "EXPENSE" ? "border-neutral-900 bg-neutral-900 text-white dark:border-white dark:bg-white dark:text-black" : "border-neutral-900 bg-neutral-900 text-white dark:border-white dark:bg-white dark:text-black"
+                ? t === "EXPENSE" ? "border-red-600 bg-red-50 text-red-700 dark:border-red-500 dark:bg-red-950/40 dark:text-red-400" : "border-green-600 bg-green-50 text-green-700 dark:border-green-500 dark:bg-green-950/40 dark:text-green-400"
                 : "border-neutral-200 text-neutral-500 dark:border-neutral-700 dark:text-neutral-400"
             }`}
           >

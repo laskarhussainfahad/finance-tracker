@@ -288,7 +288,7 @@ export default function Import() {
                           {categories.filter((c) => c.type === r.type).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                         </select>
                       </td>
-                      <td className={`amount whitespace-nowrap px-4 py-2 text-right font-medium ${r.type === "INCOME" ? "text-neutral-900 dark:text-white" : "text-neutral-500 dark:text-neutral-400"}`}>
+                      <td className={`amount whitespace-nowrap px-4 py-2 text-right font-medium ${r.type === "INCOME" ? "text-green-600 dark:text-green-500" : "text-red-600 dark:text-red-500"}`}>
                         {r.type === "INCOME" ? "+" : "−"}{formatINR(r.amount)}
                       </td>
                     </tr>

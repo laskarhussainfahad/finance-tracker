@@ -67,7 +67,7 @@ export default function Transactions() {
                 </td>
                 <td className="px-5 py-3">{tx.category.name}</td>
                 <td className="muted px-5 py-3">{tx.note}</td>
-                <td className={`amount px-5 py-3 text-right font-medium ${tx.type === "INCOME" ? "text-neutral-900 dark:text-white" : "text-neutral-500 dark:text-neutral-400"}`}>
+                <td className={`amount px-5 py-3 text-right font-medium ${tx.type === "INCOME" ? "text-green-600 dark:text-green-500" : "text-red-600 dark:text-red-500"}`}>
                   {tx.type === "INCOME" ? "+" : "−"}{formatINR(tx.amount)}
                 </td>
                 <td className="px-5 py-3 text-right whitespace-nowrap">

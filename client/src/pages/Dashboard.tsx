@@ -57,8 +57,8 @@ export default function Dashboard() {
       )}
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <StatCard label="Income" value={summary?.income ?? 0} tone="text-neutral-900 dark:text-white" />
-        <StatCard label="Expenses" value={summary?.expense ?? 0} tone="text-neutral-900 dark:text-white" />
+        <StatCard label="Income" value={summary?.income ?? 0} tone="text-green-600 dark:text-green-500" />
+        <StatCard label="Expenses" value={summary?.expense ?? 0} tone="text-red-600 dark:text-red-500" />
         <StatCard label="Balance" value={summary?.balance ?? 0} tone={(summary?.balance ?? 0) >= 0 ? "text-neutral-800 dark:text-neutral-100" : "text-red-600 dark:text-red-400"} />
       </div>
 
@@ -89,8 +89,8 @@ export default function Dashboard() {
               <YAxis fontSize={12} tick={{ fill: axis }} stroke={grid} tickFormatter={(v) => (Number(v) >= 1000 ? `₹${Number(v) / 1000}k` : `₹${v}`)} />
               <Tooltip formatter={(v) => formatINR(Number(v))} contentStyle={tooltipStyle} cursor={{ fill: isDark ? "#171717" : "#f5f5f5" }} />
               <Legend />
-              <Bar dataKey="income" name="Income" fill={isDark ? "#ededed" : "#171717"} radius={[4, 4, 0, 0]} />
-              <Bar dataKey="expense" name="Expense" fill={isDark ? "#525252" : "#a3a3a3"} radius={[4, 4, 0, 0]} />
+              <Bar dataKey="income" name="Income" fill={isDark ? "#22c55e" : "#16a34a"} radius={[4, 4, 0, 0]} />
+              <Bar dataKey="expense" name="Expense" fill={isDark ? "#ef4444" : "#dc2626"} radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
