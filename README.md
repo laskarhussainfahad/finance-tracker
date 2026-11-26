@@ -2,7 +2,7 @@
 
 A personal finance app for tracking income and expenses, setting monthly budgets per category, and seeing where your money goes through charts.
 
-**Live demo:** _(link coming soon)_ — log in with `demo@example.com` / `demo12345`, or sign up with any email.
+**Live demo: https://finance-tracker-puce-six.vercel.app** — log in with `demo@example.com` / `demo12345`, or sign up with any email.
 
 It runs entirely in your browser: no server or database to set up, and your data is saved in your own browser (localStorage). An optional Express + PostgreSQL backend is included in `server/` for a full-stack setup.
 
