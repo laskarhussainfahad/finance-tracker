@@ -2,7 +2,7 @@
 
 A personal finance app for tracking income and expenses, setting monthly budgets per category, and seeing where your money goes through charts.
 
-**Live demo: https://laskarhussainfahad.github.io/finance-tracker/** — log in with `demo@example.com` / `demo12345`, or sign up with any email.
+**Live demo:** _(link coming soon)_ — log in with `demo@example.com` / `demo12345`, or sign up with any email.
 
 It runs entirely in your browser: no server or database to set up, and your data is saved in your own browser (localStorage). An optional Express + PostgreSQL backend is included in `server/` for a full-stack setup.
 
@@ -78,7 +78,7 @@ To use the Express + PostgreSQL API instead (shared data, real JWT auth):
 
 ## Deployment
 
-Every push to `main` builds the app and publishes it to GitHub Pages (`.github/workflows/deploy.yml`).
+Deployed on [Vercel](https://vercel.com) from this repository (root directory `client`). Every push to `main` redeploys automatically.
 
 ## Running tests (backend)
 
