@@ -85,7 +85,7 @@ export default function Dashboard() {
             <BarChart data={monthly}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={grid} />
               <XAxis dataKey="month" fontSize={12} tick={{ fill: axis }} stroke={grid} />
-              <YAxis fontSize={12} tick={{ fill: axis }} stroke={grid} tickFormatter={(v) => `₹${Number(v) / 1000}k`} />
+              <YAxis fontSize={12} tick={{ fill: axis }} stroke={grid} tickFormatter={(v) => (Number(v) >= 1000 ? `₹${Number(v) / 1000}k` : `₹${v}`)} />
               <Tooltip formatter={(v) => formatINR(Number(v))} contentStyle={tooltipStyle} cursor={{ fill: isDark ? "#1e293b" : "#f1f5f9" }} />
               <Legend />
               <Bar dataKey="income" name="Income" fill="#059669" radius={[4, 4, 0, 0]} />

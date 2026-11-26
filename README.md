@@ -1,6 +1,10 @@
 # ₹ Finance Tracker
 
-A full-stack personal finance app for tracking income and expenses, setting monthly budgets per category, and seeing where your money goes through charts.
+A personal finance app for tracking income and expenses, setting monthly budgets per category, and seeing where your money goes through charts.
+
+**Live demo: https://laskarhussainfahad.github.io/finance-tracker/** — log in with `demo@example.com` / `demo12345`, or sign up with any email.
+
+It runs entirely in your browser: no server or database to set up, and your data is saved in your own browser (localStorage). An optional Express + PostgreSQL backend is included in `server/` for a full-stack setup.
 
 ![Dashboard](docs/screenshots/dashboard.png)
 
@@ -45,31 +49,38 @@ finance-tracker/
 
 ## Running it locally
 
-**Prerequisites:** Node.js 20+ and PostgreSQL (installed locally, or a free cloud database from [Neon](https://neon.tech)).
+**Prerequisite:** Node.js 20+.
 
-1. **Create a database** called `finance_tracker`.
+```bash
+cd client
+npm install
+npm run dev        # open http://localhost:5173
+```
 
-2. **Start the backend**
+That's it: the app uses its built-in browser backend (`client/src/api/localBackend.ts`), so no server or database is needed. Log in with **demo@example.com / demo12345** or create an account. Data is stored in your browser's localStorage, so each visitor has their own.
+
+### Optional: run with the real backend
+
+To use the Express + PostgreSQL API instead (shared data, real JWT auth):
+
+1. Create a PostgreSQL database called `finance_tracker` (locally, or free on [Neon](https://neon.tech)).
+2. Start the API:
    ```bash
    cd server
    npm install
    cp .env.example .env      # on Windows: copy .env.example .env
-   # edit .env: set DATABASE_URL to your database and JWT_SECRET to any long random string
-   npm run db:migrate        # creates the tables
-   npm run db:seed           # optional: demo user with 3 months of sample data
-   npm run dev               # API on http://localhost:4000
+   # edit .env: DATABASE_URL and JWT_SECRET
+   npm run db:migrate
+   npm run db:seed           # optional demo data
+   npm run dev               # http://localhost:4000
    ```
+3. In `client/`, create a `.env` file containing `VITE_BACKEND=server`, then run `npm run dev`.
 
-3. **Start the frontend** in a second terminal
-   ```bash
-   cd client
-   npm install
-   npm run dev               # app on http://localhost:5173
-   ```
+## Deployment
 
-4. Open http://localhost:5173 and log in with **demo@example.com / demo12345**, or create your own account.
+Every push to `main` builds the app and publishes it to GitHub Pages (`.github/workflows/deploy.yml`).
 
-## Running tests
+## Running tests (backend)
 
 ```bash
 cd server
@@ -108,7 +119,6 @@ All routes except `/api/auth/*` need an `Authorization: Bearer <token>` header.
 - [ ] Recurring transactions (rent, subscriptions)
 - [ ] Auto-categorisation from transaction notes (e.g. "Swiggy" → Food)
 - [ ] Ask questions about your spending in plain English
-- [ ] Deploy (Vercel + Render + Neon)
 
 ## Author
 
