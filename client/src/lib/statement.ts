@@ -58,22 +58,31 @@ function findColumn(headers: string[], tests: ((h: string) => boolean)[]) {
   return -1;
 }
 
+// Words that mean money out / money in, as banks write them in headers and cells.
+const OUT_WORDS = ["debit", "debits", "dr", "withdrawal", "withdrawals", "withdrawn", "paid", "sent", "spent", "outflow", "out", "expense", "purchase"];
+const IN_WORDS = ["credit", "credits", "cr", "deposit", "deposits", "deposited", "received", "inflow", "in", "income", "refund", "reversal", "cashback"];
+const words = (s: string) => s.split(/[\s/]+/).filter(Boolean);
+const hasWord = (s: string, list: string[]) => words(s).some((w) => list.includes(w));
+
 function guessFromHeader(row: Cell[]): Omit<Mapping, "header"> | null {
   const h = row.map(norm);
-  const has = (s: string, ...words: string[]) => words.some((w) => s.includes(w));
-  const notMeta = (s: string) => !has(s, "balance", "ref", "chq", "cheque", "value date");
+  const has = (s: string, ...parts: string[]) => parts.some((w) => s.includes(w));
+  const notMeta = (s: string) => !has(s, "balance", "ref", "chq", "cheque", "value date", "card", "date", "type", "mode", "status");
+  const isOut = (s: string) => notMeta(s) && (hasWord(s, OUT_WORDS) || has(s, "debit", "withdraw", "money out", "paid out")) && !hasWord(s, IN_WORDS) && !has(s, "credit", "deposit");
+  const isIn = (s: string) => notMeta(s) && (hasWord(s, IN_WORDS) || has(s, "credit", "deposit", "money in", "received")) && !hasWord(s, OUT_WORDS) && !has(s, "debit", "withdraw");
 
-  const date = findColumn(h, [(s) => /^(txn |transaction |tran )?date$/.test(s), (s) => s.includes("date") && !s.includes("value")]);
+  const date = findColumn(h, [(s) => /^(txn |transaction |tran |posting |value )?(date|dt)$/.test(s) && !s.startsWith("value"), (s) => s.includes("date") && !s.includes("value"), (s) => s.includes("date")]);
   const description = findColumn(h, [
-    (s) => has(s, "narration", "description", "particulars", "remarks", "transaction details", "details"),
-    (s) => has(s, "merchant", "payee", "paid to", "beneficiary", "name"),
+    (s) => has(s, "narration", "description", "particulars", "remarks", "transaction details", "details", "info"),
+    (s) => has(s, "merchant", "payee", "paid to", "beneficiary", "name", "transaction"),
   ]);
-  const debit = findColumn(h, [(s) => notMeta(s) && has(s, "debit", "withdrawal", "money out", "paid out") && !has(s, "credit")]);
-  const credit = findColumn(h, [(s) => notMeta(s) && has(s, "credit", "deposit", "money in", "received") && !has(s, "debit")]);
-  const amount = findColumn(h, [(s) => notMeta(s) && has(s, "amount") && !has(s, "debit", "credit", "withdrawal", "deposit")]);
+  // A "Paid to" or "Received from" column holds names, not money, so skip the description column.
+  const debit = findColumn(h, [(s) => isOut(s) && h.indexOf(s) !== description]);
+  const credit = findColumn(h, [(s) => isIn(s) && h.indexOf(s) !== description]);
+  const amount = findColumn(h, [(s) => notMeta(s) && has(s, "amount", "amt", "value", "inr", "rs") && !isOut(s) && !isIn(s)]);
   const type = findColumn(h, [
-    (s) => /^(dr ?\/ ?cr|cr ?\/ ?dr|debit ?\/ ?credit|credit ?\/ ?debit)$/.test(s),
-    (s) => has(s, "type") && !has(s, "account"),
+    (s) => /^(dr ?\/ ?cr|cr ?\/ ?dr|debit ?\/ ?credit|credit ?\/ ?debit|d ?\/ ?c|c ?\/ ?d)$/.test(s),
+    (s) => has(s, "type", "dr/cr", "cr/dr", "direction", "indicator") && !has(s, "account", "payment mode"),
   ]);
 
   if (date === -1) return null;
@@ -84,11 +93,29 @@ function guessFromHeader(row: Cell[]): Omit<Mapping, "header"> | null {
   return null;
 }
 
+// A column whose cells say Dr/Cr (or Debit/Credit), even if its header is something odd.
+function findTypeColumn(grid: Grid, header: number, skip: number[]) {
+  const body = grid.slice(header + 1, header + 201);
+  const width = Math.max(0, ...body.map((r) => r.length));
+  for (let c = 0; c < width; c++) {
+    if (skip.includes(c)) continue;
+    const kinds = body.map((r) => readType(r[c] ?? null)).filter(Boolean);
+    const filled = body.filter((r) => text(r[c] ?? null) !== "").length;
+    if (filled > 0 && kinds.length >= filled * 0.8 && kinds.includes("INCOME") && kinds.includes("EXPENSE")) return c;
+  }
+  return -1;
+}
+
 // Statements often start with a few lines of account details, so look for the real header row.
 export function guessMapping(grid: Grid): Mapping | null {
   for (let i = 0; i < Math.min(grid.length, 40); i++) {
     const guess = guessFromHeader(grid[i]);
-    if (guess) return { header: i, ...guess };
+    if (!guess) continue;
+    const map: Mapping = { header: i, ...guess };
+    if (map.mode === "single" && map.type === -1) {
+      map.type = findTypeColumn(grid, i, [map.date, map.description, map.amount]);
+    }
+    return map;
   }
   return null;
 }
@@ -138,7 +165,9 @@ export function parseAmount(cell: Cell): { value: number; sign: -1 | 0 | 1 } | n
   let sign: -1 | 0 | 1 = 0;
   if (/\bdr\.?$/i.test(s)) sign = -1;
   if (/\bcr\.?$/i.test(s)) sign = 1;
-  if (/^\(.*\)$/.test(s) || /^-/.test(s.replace(/^(₹|rs\.?|inr)\s*/i, ""))) sign = -1;
+  const bare = s.replace(/^(₹|rs\.?|inr)\s*/i, "");
+  if (/^\(.*\)$/.test(s) || /^-/.test(bare) || /-\s*$/.test(s)) sign = -1;
+  if (/^\+/.test(bare)) sign = 1;
   s = s.replace(/(₹|rs\.?|inr|dr\.?|cr\.?|[,()\s+-])/gi, "");
   if (!/^\d+(\.\d+)?$/.test(s)) return null;
   const value = Number(s);
@@ -178,8 +207,20 @@ export function cleanNote(raw: string) {
 
 function readType(cell: Cell): TxType | null {
   const s = norm(cell);
-  if (/^(dr|d|debit|withdrawal|paid|sent|debited)$/.test(s)) return "EXPENSE";
-  if (/^(cr|c|credit|deposit|received|credited)$/.test(s)) return "INCOME";
+  if (!s) return null;
+  const isIn = hasWord(s, IN_WORDS) || /credit|deposit|receiv|refund/.test(s) || s === "c";
+  const isOut = hasWord(s, OUT_WORDS) || /debit|withdraw|purchase|payment/.test(s) || s === "d";
+  if (isIn && !isOut) return "INCOME";
+  if (isOut && !isIn) return "EXPENSE";
+  return null;
+}
+
+// Last resort when nothing else says which way the money went: the narration often does
+// ("UPI/CR/...", "NEFT CR-", "Received from ...", "Salary credited").
+function typeFromNote(raw: string): TxType | null {
+  const s = raw.toLowerCase();
+  if (/(^|[\s/:*-])(cr|credit|credited)([\s/:*-]|$)|received from|money received|refund|cashback|salary|reversal|deposit/.test(s)) return "INCOME";
+  if (/(^|[\s/:*-])(dr|debit|debited)([\s/:*-]|$)|paid to|sent to|purchase|withdrawal|atm/.test(s)) return "EXPENSE";
   return null;
 }
 
@@ -205,7 +246,9 @@ export function buildRows(grid: Grid, map: Mapping): ParsedRow[] {
     const amt = parseAmount(row[map.amount] ?? null);
     if (!amt) continue;
     const typed = map.type >= 0 ? readType(row[map.type] ?? null) : null;
-    const type: TxType = typed ?? (amt.sign === 1 ? "INCOME" : amt.sign === -1 ? "EXPENSE" : hasNegatives ? "INCOME" : "EXPENSE");
+    const type: TxType =
+      typed ??
+      (amt.sign === 1 ? "INCOME" : amt.sign === -1 ? "EXPENSE" : hasNegatives ? "INCOME" : typeFromNote(raw) ?? "EXPENSE");
     rows.push({ date, note, raw, amount: amt.value, type });
   }
   return rows;
@@ -214,10 +257,7 @@ export function buildRows(grid: Grid, map: Mapping): ParsedRow[] {
 // When a single amount column has no Dr/Cr and no minus signs, we can't tell money in from out.
 export function directionUnknown(grid: Grid, map: Mapping) {
   if (map.mode !== "single" || map.type >= 0) return false;
-  return !grid.slice(map.header + 1).some((r) => {
-    const a = parseAmount(r[map.amount] ?? null);
-    return a && a.sign !== 0;
-  });
+  return !buildRows(grid, map).some((r) => r.type === "INCOME");
 }
 
 // ---------- automatic categories ----------
