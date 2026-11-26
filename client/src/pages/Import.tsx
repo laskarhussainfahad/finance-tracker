@@ -43,7 +43,7 @@ export default function Import() {
     setRows(
       buildRows(grid, mapping).map((r, key) => {
         const duplicate = seen.has(`${r.date}|${r.amount}|${r.type}`);
-        return { ...r, key, duplicate, selected: !duplicate, categoryId: guessCategory(r.raw, r.type, categories) };
+        return { ...r, key, duplicate, selected: !duplicate, categoryId: guessCategory(`${r.raw} ${r.note}`, r.type, categories) };
       })
     );
   }, [grid, mapping, existing, categories]);
@@ -92,7 +92,7 @@ export default function Import() {
       all.map((r) => {
         if (r.key !== key) return r;
         const next = { ...r, ...change };
-        if (change.type && change.type !== r.type) next.categoryId = guessCategory(r.raw, change.type, categories);
+        if (change.type && change.type !== r.type) next.categoryId = guessCategory(`${r.raw} ${r.note}`, change.type, categories);
         return next;
       })
     );

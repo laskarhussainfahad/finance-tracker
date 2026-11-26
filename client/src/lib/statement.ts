@@ -176,31 +176,49 @@ export function parseAmount(cell: Cell): { value: number; sign: -1 | 0 | 1 } | n
 
 // ---------- making notes readable ----------
 
-const NOISE = new Set(["upi", "dr", "cr", "p2m", "p2a", "imps", "neft", "rtgs", "pos", "ach", "by", "to", "from", "transfer", "txn", "payment", "pay"]);
+const NOISE = new Set(["upi", "dr", "cr", "p2m", "p2a", "imps", "neft", "rtgs", "pos", "ach", "ecom", "by", "to", "from", "transfer", "txn", "payment", "pay", "in", "out"]);
 
 const tidy = (part: string) => {
-  const words = part.split(/\s+/).filter((w) => w && !/\d/.test(w)); // drop card and reference numbers
+  const words = part.split(/\s+/).filter((w) => /[a-z]/i.test(w) && !/\d/.test(w)); // drop card and reference numbers
   while (words.length && NOISE.has(words[0].toLowerCase())) words.shift(); // drop "POS", "NEFT CR", ...
   const out = words.join(" ");
   // SHOUTING CAPS -> Title Case; keep names that already have their own casing (DMart, BookMyShow)
   return out === out.toUpperCase() ? out.toLowerCase().replace(/\b[a-z]/g, (c) => c.toUpperCase()) : out;
 };
 
+// Bank codes that mean something on their own.
+const SPECIAL: [RegExp, string][] = [
+  [/upi[-_ ]?rev/i, "UPI reversal"],
+  [/(imps|neft|rtgs)[-_ ]?(chg|chrg|charges?)/i, "Bank charges"],
+  [/sms ?chrg|sms ?charges?/i, "SMS charges"],
+  [/int\.?\s?pd|interest (paid|credit)|\bint\.? ?cr/i, "Interest"],
+  [/rcradj|\badj(ustment)?\b/i, "Adjustment"],
+  [/atm ?(wdl|withdrawal)|\bnwd\b|cash ?withdrawal/i, "ATM withdrawal"],
+];
+
 // "UPI/DR/412345678901/SWIGGY/YESB/swiggy@ybl/Pay" -> "Swiggy"; "POS 4123XXXX AMAZON PAY INDIA" -> "Amazon Pay India"
 export function cleanNote(raw: string) {
-  const s = raw.replace(/\s+/g, " ").trim();
-  const at = s.search(/\b(upi|imps|neft|rtgs|pos|ach)\b/i);
+  const s = raw.replace(/\s+/g, " ").replace(/\\/g, "").trim();
+  for (const [re, label] of SPECIAL) if (re.test(s)) return label;
+
+  // Standard UPI narration: UPI/DR|CR/<reference>/<name>/<bank>/<upi id>/<note>
+  const upi = s.match(/upi\/(?:dr|cr|p2[am])\/\d+\/([^/]*)/i);
+  if (upi && /[a-z]{2,}/i.test(upi[1])) return tidy(upi[1]) || upi[1].trim();
+
+  const at = s.search(/(?<![a-z])(upi|imps|neft|rtgs|pos|ach|ecom)(?![a-z])/i);
   if (at !== -1) {
     const part = s
       .slice(at)
-      .split(/[/:|*-]/)
+      .split(/[/:|*_-]/)
       .map((p) => p.trim())
-      .filter((p) => !p.includes("@") && !/^[A-Z]{4}\d*$/.test(p)) // UPI handles and bank codes like YESB
+      .filter((p) => !p.includes("@") && !/^[A-Z]{4}0?\d*$/.test(p)) // UPI handles and bank/IFSC codes like YESB
       .map(tidy)
       .find((p) => /[a-z]{3,}/i.test(p));
     if (part) return part.slice(0, 200);
+    if (/^imps/i.test(s)) return "IMPS transfer";
+    if (/^neft/i.test(s)) return "NEFT transfer";
   }
-  return s.slice(0, 200);
+  return (tidy(s) || s).slice(0, 200);
 }
 
 // ---------- building the rows ----------
@@ -264,14 +282,14 @@ export function directionUnknown(grid: Grid, map: Mapping) {
 
 const RULES: [RegExp, string][] = [
   [/salary|payroll|sal cr/i, "Salary"],
-  [/freelance|upwork|fiverr|invoice/i, "Freelance"],
-  [/swiggy|zomato|blinkit|zepto|instamart|bigbasket|dominos|domino's|pizza|cafe|restaurant|starbucks|mcdonald|kfc|food|grocer|dmart|eatsure/i, "Food"],
-  [/rent|landlord|nobroker|housing/i, "Rent"],
-  [/uber|ola|rapido|metro|irctc|railway|redbus|petrol|fuel|indian oil|hpcl|bpcl|fastag|indigo|air ?india|makemytrip|parking/i, "Transport"],
-  [/amazon|flipkart|myntra|ajio|meesho|nykaa|decathlon|croma|reliance digital|shopping|mall/i, "Shopping"],
-  [/electricity|bescom|tneb|msedcl|water|gas|broadband|wifi|jio|airtel|\bvi\b|vodafone|bsnl|recharge|dth|tata ?play|bill|insurance|emi|loan/i, "Bills"],
-  [/netflix|spotify|hotstar|prime video|youtube|bookmyshow|pvr|inox|steam|playstation|movie/i, "Entertainment"],
-  [/pharma|pharmacy|apollo|medplus|1mg|netmeds|hospital|clinic|doctor|diagnostic|lab|health/i, "Health"],
+  [/freelance|upwork|fiverr|invoice|payoneer|paypal|stripe|razorpay ?payout/i, "Freelance"],
+  [/swiggy|zomato|blinkit|zepto|instamart|bigbasket|domino|pizza|cafe|restaurant|resta|starbucks|mcdonald|\bkfc|kfc|burger|food|grocer|dmart|eatsure|bakery|sweets/i, "Food"],
+  [/\brent\b|landlord|nobroker|housing\.com/i, "Rent"],
+  [/\buber\b|\bola\b|olacabs|rapido|\bmetro\b|irctc|railway|redbus|petrol|fuel|indian ?oil|hpcl|bpcl|fastag|indigo|air ?india|makemytrip|parking/i, "Transport"],
+  [/amazon|flipkart|ekart|myntra|ajio|meesho|nykaa|decathlon|croma|reliance ?digital|shopping|\bmall\b/i, "Shopping"],
+  [/electricity|bescom|tneb|msedcl|apdcl|\bwater\b|\bgas\b|broadband|wifi|\bjio\b|airtel|\bvi\b|vodafone|bsnl|recharge|paybil|\bdth\b|tata ?play|\bbill\b|insurance|\bemi\b|\bloan\b|charges/i, "Bills"],
+  [/netflix|spotify|hotstar|prime ?video|youtube|google ?play|playstore|bookmyshow|\bpvr\b|inox|steam|playstation|movie/i, "Entertainment"],
+  [/pharma|pharmacy|apollo|medplus|1mg|netmeds|hospital|clinic|doctor|diagnostic|health/i, "Health"],
 ];
 
 export function guessCategory(note: string, type: TxType, categories: Category[]): number {
