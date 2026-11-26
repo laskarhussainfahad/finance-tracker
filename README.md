@@ -15,6 +15,7 @@ It runs entirely in your browser: no server or database to set up, and your data
 - **Categories**: sensible defaults (Food, Rent, Salary…) created for every new user
 - **Dashboard**: monthly income, expenses and balance, a spending-by-category donut chart, and a 6-month income-vs-expense bar chart
 - **Budgets**: set a monthly limit per category, with progress bars that turn amber at 80% and red when you go over, plus an over-budget alert on the dashboard
+- **Statement import**: upload a bank or UPI statement (CSV or Excel). It finds the columns, reads Indian date and amount formats, cleans up UPI narrations, fills in categories (Swiggy → Food, Uber → Transport…), and skips transactions you already added. The file is read in the browser and never uploaded
 - **Light and dark theme**: follows your system setting by default, with a toggle to pick light, dark or system; the choice is remembered
 - **Data isolation**: every query is scoped to the logged-in user, and this is covered by tests
 
@@ -22,7 +23,7 @@ It runs entirely in your browser: no server or database to set up, and your data
 
 | Layer | Tech |
 |---|---|
-| Frontend | React 19, TypeScript, Vite, Tailwind CSS, Recharts, React Router |
+| Frontend | React 19, TypeScript, Vite, Tailwind CSS, Recharts, React Router, PapaParse + read-excel-file (statement import) |
 | Backend | Node.js, Express, TypeScript, Zod (validation) |
 | Database | PostgreSQL with Drizzle ORM (type-safe queries and SQL migrations) |
 | Auth | JWT + bcrypt |
@@ -115,9 +116,8 @@ All routes except `/api/auth/*` need an `Authorization: Bearer <token>` header.
 
 ## Roadmap
 
-- [ ] CSV import for bank statements
 - [ ] Recurring transactions (rent, subscriptions)
-- [ ] Auto-categorisation from transaction notes (e.g. "Swiggy" → Food)
+- [ ] PDF statement import
 - [ ] Ask questions about your spending in plain English
 
 ## Author

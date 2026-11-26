@@ -70,6 +70,24 @@ router.post("/", async (req: AuthRequest, res, next) => {
   }
 });
 
+// POST /api/transactions/import  { items: [...] } -> saves many transactions at once (from a statement)
+router.post("/import", async (req: AuthRequest, res, next) => {
+  try {
+    const { items } = z.object({ items: z.array(txSchema).min(1).max(5000) }).parse(req.body);
+    const mine = await db
+      .select({ id: categories.id, type: categories.type })
+      .from(categories)
+      .where(eq(categories.userId, req.userId!));
+    const bad = items.findIndex((t) => !mine.some((c) => c.id === t.categoryId && c.type === t.type));
+    if (bad !== -1) return res.status(400).json({ error: `Row ${bad + 1}: category doesn't exist or doesn't match the type` });
+
+    await db.insert(transactions).values(items.map((t) => ({ ...t, note: t.note ?? null, userId: req.userId! })));
+    res.status(201).json({ imported: items.length });
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.put("/:id", async (req: AuthRequest, res, next) => {
   try {
     const id = Number(req.params.id);

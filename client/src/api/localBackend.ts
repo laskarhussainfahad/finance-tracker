@@ -148,6 +148,25 @@ export async function localApi(method: string, path: string, body: any, token: s
     const validCategory = (categoryId: number, type: TxType) =>
       db.categories.some((c) => c.id === categoryId && c.userId === userId && c.type === type);
 
+    // Bulk import from a statement: all rows are checked first, then saved together.
+    if (method === "POST" && parts[1] === "import") {
+      const items = Array.isArray(body?.items) ? body.items : null;
+      if (!items || items.length === 0) throw new ApiError(400, "Nothing to import");
+      if (items.length > 5000) throw new ApiError(400, "Import at most 5000 rows at a time");
+      const rows = items.map((item: unknown, i: number) => {
+        try {
+          const data = readTx(item);
+          if (!validCategory(data.categoryId, data.type)) throw new ApiError(400, "Category doesn't match the type");
+          return data;
+        } catch (err) {
+          throw new ApiError(400, `Row ${i + 1}: ${(err as Error).message}`);
+        }
+      });
+      for (const data of rows) db.transactions.push({ id: db.nextId++, ...data, userId });
+      save(db);
+      return { imported: rows.length };
+    }
+
     if (method === "GET") {
       const month = params.get("month");
       const type = params.get("type");

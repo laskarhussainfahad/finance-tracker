@@ -55,8 +55,13 @@ export async function api<T>(path: string, options: RequestInit = {}): Promise<T
   return res.status === 204 ? (undefined as T) : res.json();
 }
 
-export const formatINR = (n: number) =>
-  new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(n);
+// Whole rupees show without decimals (₹450); amounts with paise keep them (₹289.50).
+export const formatINR = (n: number) => {
+  const digits = Number.isInteger(n) ? 0 : 2;
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency", currency: "INR", minimumFractionDigits: digits, maximumFractionDigits: digits,
+  }).format(n);
+};
 
 export const currentMonth = () => {
   const d = new Date();

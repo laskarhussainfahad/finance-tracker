@@ -75,6 +75,25 @@ describe("transactions, stats and budgets", () => {
   });
 });
 
+describe("statement import", () => {
+  it("imports many transactions at once and rejects another user's category", async () => {
+    const auth = { Authorization: `Bearer ${token}` };
+    const date = new Date().toISOString();
+    const ok = await request(app).post("/api/transactions/import").set(auth).send({
+      items: [
+        { amount: 120, type: "EXPENSE", date, categoryId: foodId, note: "Swiggy" },
+        { amount: 80, type: "EXPENSE", date, categoryId: foodId, note: "Zomato" },
+      ],
+    });
+    expect(ok.status).toBe(201);
+    expect(ok.body.imported).toBe(2);
+
+    const bad = await request(app).post("/api/transactions/import").set(auth)
+      .send({ items: [{ amount: 10, type: "INCOME", date, categoryId: foodId }] });
+    expect(bad.status).toBe(400);
+  });
+});
+
 describe("data isolation", () => {
   it("does not let one user touch another user's transactions", async () => {
     const other = await request(app).post("/api/auth/register")
