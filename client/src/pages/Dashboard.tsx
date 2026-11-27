@@ -7,11 +7,11 @@ import { useTheme } from "../context/ThemeContext";
 // Category colours for the donut chart, in the spirit of Vercel's palette.
 const COLORS = ["#0070f3", "#7928ca", "#eb367f", "#f5a623", "#8f8f8f", "#3291ff", "#d4d4d4", "#ff4d4d"];
 
-function StatCard({ label, value, tone }: { label: string; value: number; tone: string }) {
+function StatCard({ label, value, tone, className = "" }: { label: string; value: number; tone: string; className?: string }) {
   return (
-    <div className="card">
+    <div className={`card ${className}`}>
       <p className="muted text-sm">{label}</p>
-      <p className={`amount mt-2 text-2xl font-semibold tracking-tight ${tone}`}>{formatINR(value)}</p>
+      <p className={`amount mt-2 text-xl font-semibold sm:text-2xl tracking-tight ${tone}`}>{formatINR(value)}</p>
     </div>
   );
 }
@@ -56,10 +56,10 @@ export default function Dashboard() {
         </div>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
         <StatCard label="Income" value={summary?.income ?? 0} tone="text-green-600 dark:text-green-500" />
         <StatCard label="Expenses" value={summary?.expense ?? 0} tone="text-red-600 dark:text-red-500" />
-        <StatCard label="Balance" value={summary?.balance ?? 0} tone={(summary?.balance ?? 0) >= 0 ? "text-neutral-800 dark:text-neutral-100" : "text-red-600 dark:text-red-400"} />
+        <StatCard label="Balance" value={summary?.balance ?? 0} tone={(summary?.balance ?? 0) >= 0 ? "text-neutral-800 dark:text-neutral-100" : "text-red-600 dark:text-red-400"} className="col-span-2 sm:col-span-1" />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">

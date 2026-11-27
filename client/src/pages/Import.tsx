@@ -243,16 +243,46 @@ export default function Import() {
                   {rows.some((r) => r.duplicate) && ` · ${rows.filter((r) => r.duplicate).length} look already added (unticked)`}
                 </p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex w-full gap-2 sm:w-auto">
                 <button className="btn-ghost" onClick={() => setRows(rows.map((r) => ({ ...r, selected: !rows.every((x) => x.selected) })))}>
                   {rows.every((r) => r.selected) ? "Select none" : "Select all"}
                 </button>
-                <button className="btn" disabled={busy || selected.length === 0} onClick={save}>
+                <button className="btn ml-auto sm:ml-0" disabled={busy || selected.length === 0} onClick={save}>
                   {busy ? "Importing…" : `Import ${selected.length}`}
                 </button>
               </div>
             </div>
-            <div className="max-h-[32rem] overflow-auto border-t border-neutral-200 dark:border-neutral-800">
+            {/* phone: one card per row, type and category underneath */}
+            <ul className="divide-y divide-neutral-100 border-t border-neutral-200 sm:hidden dark:divide-neutral-800 dark:border-neutral-800">
+              {rows.map((r) => (
+                <li key={r.key} className={`space-y-2 px-4 py-3 ${r.selected ? "" : "opacity-50"}`}>
+                  <label className="flex items-start gap-3">
+                    <input type="checkbox" aria-label="Include this row" checked={r.selected} onChange={(e) => update(r.key, { selected: e.target.checked })} className="mt-1 h-5 w-5 shrink-0 accent-black dark:accent-white" />
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-medium">{r.note || "—"}</span>
+                      <span className="muted block text-xs">
+                        {new Date(`${r.date}T00:00:00Z`).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" })}
+                        {r.duplicate && <span className="text-amber-600 dark:text-amber-400"> · possibly already added</span>}
+                      </span>
+                    </span>
+                    <span className={`amount shrink-0 text-sm font-medium ${r.type === "INCOME" ? "text-green-600 dark:text-green-500" : "text-red-600 dark:text-red-500"}`}>
+                      {r.type === "INCOME" ? "+" : "−"}{formatINR(r.amount)}
+                    </span>
+                  </label>
+                  <div className="grid grid-cols-2 gap-2 pl-8">
+                    <select className="input py-1.5" aria-label="Type" value={r.type} onChange={(e) => update(r.key, { type: e.target.value as TxType })}>
+                      <option value="EXPENSE">Expense</option>
+                      <option value="INCOME">Income</option>
+                    </select>
+                    <select className="input py-1.5" aria-label="Category" value={r.categoryId} onChange={(e) => update(r.key, { categoryId: Number(e.target.value) })}>
+                      {categories.filter((c) => c.type === r.type).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                    </select>
+                  </div>
+                </li>
+              ))}
+              {rows.length === 0 && <li className="px-4 py-10 text-center text-sm text-neutral-400 dark:text-neutral-500">No transactions found with these columns. Try changing them above.</li>}
+            </ul>
+            <div className="hidden max-h-[32rem] overflow-auto border-t border-neutral-200 sm:block dark:border-neutral-800">
               <table className="w-full text-sm">
                 <thead className="sticky top-0 bg-white text-left text-neutral-500 dark:bg-neutral-900 dark:text-neutral-400">
                   <tr>

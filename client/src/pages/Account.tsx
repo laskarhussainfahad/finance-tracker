@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
 export default function Account() {
-  const { user, newRecoveryKey } = useAuth();
+  const { user, newRecoveryKey, logout } = useAuth();
   const [error, setError] = useState("");
 
   const create = async () => {
@@ -34,6 +34,9 @@ export default function Account() {
         <button className="btn" onClick={create}>Create new recovery key</button>
         {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
       </div>
+      <button className="w-full rounded-md border border-neutral-200 py-2.5 text-sm font-medium text-red-600 md:hidden dark:border-neutral-800 dark:text-red-500" onClick={logout}>
+        Log out
+      </button>
     </div>
   );
 }
